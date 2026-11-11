@@ -152,7 +152,12 @@ func (f *Options) callExtEditor(text string, app *csvi.Application) (string, err
 	}()
 	fmt.Fprintf(app, "%s\r%v %v%s", ansi.YELLOW, f.ExtEditor, fname, ansi.ERASE_LINE)
 	cmd := exec.Command(f.ExtEditor, fname)
-	if err := cmd.Run(); err != nil {
+	err = cmd.Run()
+	if f.AltScreen {
+		// a full-screen editor leaves the alternate screen when it exits
+		io.WriteString(app, ansi.ALT_SCREEN_ON)
+	}
+	if err != nil {
 		return text, err
 	}
 	output, err := os.ReadFile(fname)
@@ -163,6 +168,10 @@ func (f *Options) callExtEditor(text string, app *csvi.Application) (string, err
 }
 
 func (f *Options) RunInOut(dataSource io.Reader, ttyOut io.Writer) error {
+	if f.AltScreen {
+		io.WriteString(ttyOut, ansi.ALT_SCREEN_ON)
+		defer io.WriteString(ttyOut, ansi.ALT_SCREEN_OFF)
+	}
 	io.WriteString(ttyOut, ansi.CURSOR_OFF)
 	defer io.WriteString(ttyOut, ansi.CURSOR_ON)
 

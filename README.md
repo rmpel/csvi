@@ -137,6 +137,7 @@ Options
 * `-o filename` preset output filename in the save prompt (used with standard input)
 * `-delimiter string` Specify the field separator
 * `-autofit` Fit every column to its content on load (like pressing `=` on each column; columns set with `-w COL:WIDTH` are kept)
+* `-altscreen` Use the alternate screen like vim/less/nano do, so terminals that keep `PgUp`/`PgDn` for scrollback (e.g. macOS Terminal) pass them to csvi; the screen is restored on exit
 * `-version` Print version and exit
 
 ### Default options (`~/.csvirc`)
@@ -147,7 +148,8 @@ Options you always want can be put in `~/.csvirc` (or the file named by the `CSV
 # comments and blank lines are ignored; the leading "-" is optional
 -rv
 -autofit
--exteditor code --wait
+-altscreen
+-exteditor vim
 ```
 
 [IANA-registered-name]: https://www.iana.org/assignments/character-sets/character-sets.xhtml

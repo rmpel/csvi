@@ -31,6 +31,7 @@ type Options struct {
 	Version       bool   `flag:"version,print version and exit"`
 	Lf            bool   `flag:"lf,use LF as the default line ending for newly added lines"`
 	CrLf          bool   `flag:"crlf,use CRLF as the default line ending for newly added lines"`
+	AltScreen     bool   `flag:"altscreen,use the alternate screen (lets the terminal pass PgUp/PgDn to csvi)"`
 	AutoFit       bool   `flag:"autofit,fit every column to its content on load (like pressing '=' on each column)"`
 	flagSet       *flag.FlagSet
 }

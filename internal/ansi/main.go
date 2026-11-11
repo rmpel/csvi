@@ -10,6 +10,11 @@ const (
 
 	UNDERLINE_ON  = "\x1B[4m"
 	UNDERLINE_OFF = "\x1B[24m"
+
+	// The alternate screen buffer (as used by vim, less, nano...) has no
+	// scrollback, so terminals pass PgUp/PgDn through to the program.
+	ALT_SCREEN_ON  = "\x1B[?1049h\x1B[H"
+	ALT_SCREEN_OFF = "\x1B[?1049l"
 )
 
 var (
