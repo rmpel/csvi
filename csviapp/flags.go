@@ -2,6 +2,8 @@ package csviapp
 
 import (
 	"flag"
+	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/hymkor/struct2flag"
@@ -32,6 +34,7 @@ type Options struct {
 	Lf            bool   `flag:"lf,use LF as the default line ending for newly added lines"`
 	CrLf          bool   `flag:"crlf,use CRLF as the default line ending for newly added lines"`
 	AltScreen     bool   `flag:"altscreen,use the alternate screen (lets the terminal pass PgUp/PgDn to csvi)"`
+	NoBanner      bool   `flag:"nobanner,do not print the version banner on startup"`
 	AutoFit       bool   `flag:"autofit,fit every column to its content on load (like pressing '=' on each column)"`
 	flagSet       *flag.FlagSet
 }
@@ -50,11 +53,20 @@ func (f *Options) Bind(fs *flag.FlagSet) *Options {
 }
 
 func Run() error {
+	return RunWithBanner("")
+}
+
+// RunWithBanner is like Run, but first prints banner to stderr unless
+// -nobanner is given (-version and -help always print it).
+func RunWithBanner(banner string) error {
 	f := NewOptions().Bind(flag.CommandLine)
 	if err := applyRcFile(flag.CommandLine); err != nil {
 		return err
 	}
 	flag.Parse()
+	if banner != "" && (!f.NoBanner || f.Version || f.Help) {
+		fmt.Fprintln(os.Stderr, banner)
+	}
 
 	if args := flag.Args(); len(args) >= 1 {
 		var err error

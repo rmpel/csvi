@@ -138,6 +138,7 @@ Options
 * `-delimiter string` Specify the field separator
 * `-autofit` Fit every column to its content on load (like pressing `=` on each column; columns set with `-w COL:WIDTH` are kept)
 * `-altscreen` Use the alternate screen like vim/less/nano do, so terminals that keep `PgUp`/`PgDn` for scrollback (e.g. macOS Terminal) pass them to csvi; the screen is restored on exit
+* `-nobanner` Do not print the version banner on startup
 * `-version` Print version and exit
 
 ### Default options (`~/.csvirc`)
@@ -149,6 +150,7 @@ Options you always want can be put in `~/.csvirc` (or the file named by the `CSV
 -rv
 -autofit
 -altscreen
+-nobanner
 -exteditor vim
 ```
 

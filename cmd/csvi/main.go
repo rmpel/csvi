@@ -9,9 +9,9 @@ import (
 )
 
 func main() {
-	fmt.Fprintf(os.Stderr, "Csvi %s-%s-%s <https://hymkor.github.io/csvi>\n",
+	banner := fmt.Sprintf("Csvi %s-%s-%s <https://hymkor.github.io/csvi>",
 		version, runtime.GOOS, runtime.GOARCH)
-	if err := csviapp.Run(); err != nil {
+	if err := csviapp.RunWithBanner(banner); err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
