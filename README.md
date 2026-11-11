@@ -136,7 +136,19 @@ Options
 * `-exteditor string` External editor used with `Shift`+`R`
 * `-o filename` preset output filename in the save prompt (used with standard input)
 * `-delimiter string` Specify the field separator
+* `-autofit` Fit every column to its content on load (like pressing `=` on each column; columns set with `-w COL:WIDTH` are kept)
 * `-version` Print version and exit
+
+### Default options (`~/.csvirc`)
+
+Options you always want can be put in `~/.csvirc` (or the file named by the `CSVIRC` environment variable), one per line. They are applied before the command line, which can still override them (e.g. `-rv=false`).
+
+```
+# comments and blank lines are ignored; the leading "-" is optional
+-rv
+-autofit
+-exteditor code --wait
+```
 
 [IANA-registered-name]: https://www.iana.org/assignments/character-sets/character-sets.xhtml
 

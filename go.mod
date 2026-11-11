@@ -1,6 +1,6 @@
 module github.com/hymkor/csvi
 
-go 1.20
+go 1.21
 
 require (
 	github.com/hymkor/go-safewrite v0.4.0

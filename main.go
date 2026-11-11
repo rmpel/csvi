@@ -478,6 +478,7 @@ type Config struct {
 	OutputSep       string
 	SavePath        string
 	ExtEditor       func(string, *Application) (string, error)
+	AutoFit         bool
 }
 
 func (cfg Config) validate(row *RowPtr, col int, text string) (string, error) {
@@ -597,6 +598,41 @@ func (app *Application) nextOrFetch(p *RowPtr) *RowPtr {
 	return nil
 }
 
+// fitWidth converts the widest content of a column into a cell width
+// with one column of padding, clamped to the range '[' and ']' allow.
+func fitWidth(maxW int) int {
+	maxW++
+	if maxW < 3 {
+		return 3
+	} else if maxW > 40 {
+		return 40
+	}
+	return maxW
+}
+
+// fitAllColumns sets the width of every column to fit its content,
+// as '=' does for the current column. Columns given an explicit width
+// (e.g. by -w COL:WIDTH) are left alone.
+func (app *Application) fitAllColumns(cellWidth *CellWidth) {
+	var maxW []int
+	for p := app.Front(); p != nil; p = p.Next() {
+		for i, c := range p.Row.Cell {
+			w := runewidth.StringWidth(c.Text())
+			if i >= len(maxW) {
+				maxW = append(maxW, w)
+			} else if w > maxW[i] {
+				maxW[i] = w
+			}
+		}
+	}
+	for i, w := range maxW {
+		if _, ok := cellWidth.Option[i]; !ok {
+			cellWidth.Set(i, fitWidth(w))
+		}
+	}
+	app.clearCache()
+}
+
 // drainAllData reads any rows the background loader has not yet
 // delivered, blocking until the source is exhausted or ctx is
 // canceled. It polls tryFetchFunc instead of calling the blocking
@@ -695,6 +731,20 @@ func (cfg *Config) edit(fetch func() (*uncsv.Row, error), out io.Writer) (*Resul
 		return keyWorker.TryFetch(100 * time.Millisecond)
 	}
 
+	message := cfg.Message
+	if cfg.AutoFit {
+		ctx, cancel := app.withSlowOperation("Reading all data...")
+		drainErr := app.drainAllData(ctx)
+		interrupted := ctx.Err() != nil
+		cancel()
+		app.fitAllColumns(cellWidth)
+		if interrupted {
+			message = "Autofit interrupted; fitted to rows loaded so far"
+		} else if drainErr != nil {
+			message = drainErr.Error()
+		}
+	}
+
 	var allScreenHeight int
 	var err error
 	app.screenWidth, allScreenHeight, err = pilot.Size()
@@ -705,7 +755,6 @@ func (cfg *Config) edit(fetch func() (*uncsv.Row, error), out io.Writer) (*Resul
 		s, _ := cutStrInWidth(title, app.screenWidth-1)
 		fmt.Fprintln(out, s)
 	}
-	message := cfg.Message
 	var killbuffer pasteFunc
 	for {
 		app.screenHeight = allScreenHeight - len(cfg.Titles)
@@ -1172,13 +1221,7 @@ func (cfg *Config) edit(fetch func() (*uncsv.Row, error), out io.Writer) (*Resul
 						maxW = w
 					}
 				}
-				maxW++
-				if maxW < 3 {
-					maxW = 3
-				} else if maxW > 40 {
-					maxW = 40
-				}
-				cellWidth.Set(app.cursorCol, maxW)
+				cellWidth.Set(app.cursorCol, fitWidth(maxW))
 				app.clearCache()
 			}
 		}

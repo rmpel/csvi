@@ -197,6 +197,7 @@ func (f *Options) RunInOut(dataSource io.Reader, ttyOut io.Writer) error {
 		OutputSep:     f.OutputSep,
 		SavePath:      f.SavePath,
 		ExtEditor:     extEditor,
+		AutoFit:       f.AutoFit,
 	}.Edit(dataSource, ttyOut)
 
 	return err

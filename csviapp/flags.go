@@ -31,6 +31,7 @@ type Options struct {
 	Version       bool   `flag:"version,print version and exit"`
 	Lf            bool   `flag:"lf,use LF as the default line ending for newly added lines"`
 	CrLf          bool   `flag:"crlf,use CRLF as the default line ending for newly added lines"`
+	AutoFit       bool   `flag:"autofit,fit every column to its content on load (like pressing '=' on each column)"`
 	flagSet       *flag.FlagSet
 }
 
@@ -49,6 +50,9 @@ func (f *Options) Bind(fs *flag.FlagSet) *Options {
 
 func Run() error {
 	f := NewOptions().Bind(flag.CommandLine)
+	if err := applyRcFile(flag.CommandLine); err != nil {
+		return err
+	}
 	flag.Parse()
 
 	if args := flag.Args(); len(args) >= 1 {

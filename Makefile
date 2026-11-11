@@ -25,6 +25,11 @@ all:
 	$(GO) fmt ./...
 	$(SET) "CGO_ENABLED=0" && $(GO) build $(GOOPT) -tags debug "./cmd/$(NAME)"
 
+install:
+	$(SET) "CGO_ENABLED=0" && $(GO) build $(GOOPT) "./cmd/$(NAME)"
+	mkdir -p $(HOME)/.local/bin
+	ln -sfn "$(CURDIR)/$(NAME)$(EXE)" "$(HOME)/.local/bin/$(NAME)$(EXE)"
+
 _dist:
 	$(SET) "CGO_ENABLED=0" && $(GO) build $(GOOPT) "./cmd/$(NAME)"
 	zip -9 $(NAME)-$(VERSION)-$(GOOS)-$(GOARCH).zip $(NAME)$(EXE)
